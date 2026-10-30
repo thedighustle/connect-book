@@ -131,7 +131,7 @@ function BookPage() {
                 disabled={{ before: startOfToday() }}
                 className="pointer-events-auto mt-3 p-0"
               />
-              {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
+              {errors["date"] && <p className="text-sm text-destructive">{errors["date"]}</p>}
             </div>
             <div>
               <h2 className="text-xl font-semibold">2. Choose a time</h2>
@@ -159,15 +159,15 @@ function BookPage() {
                   })}
                 </div>
               )}
-              {errors.time && <p className="mt-2 text-sm text-destructive">{errors.time}</p>}
+              {errors["time"] && <p className="mt-2 text-sm text-destructive">{errors["time"]}</p>}
             </div>
           </section>
           <section className="space-y-5 rounded-2xl border bg-card p-6 shadow-sm">
             <h2 className="text-xl font-semibold">3. Your details</h2>
-            <F id="b-name" label="Name" error={errors.name}><Input id="b-name" value={form.name} onChange={set("name")} maxLength={100} /></F>
-            <F id="b-phone" label="Phone number" error={errors.phone}><Input id="b-phone" type="tel" value={form.phone} onChange={set("phone")} maxLength={30} /></F>
-            <F id="b-email" label="Email" error={errors.email}><Input id="b-email" type="email" value={form.email} onChange={set("email")} maxLength={255} /></F>
-            <F id="b-notes" label="Notes (optional)" error={errors.notes}><Textarea id="b-notes" rows={3} value={form.notes} onChange={set("notes")} maxLength={2000} /></F>
+            <F id="b-name" label="Name" error={errors["name"]}><Input id="b-name" value={form.name} onChange={set("name")} maxLength={100} /></F>
+            <F id="b-phone" label="Phone number" error={errors["phone"]}><Input id="b-phone" type="tel" value={form.phone} onChange={set("phone")} maxLength={30} /></F>
+            <F id="b-email" label="Email" error={errors["email"]}><Input id="b-email" type="email" value={form.email} onChange={set("email")} maxLength={255} /></F>
+            <F id="b-notes" label="Notes (optional)" error={errors["notes"]}><Textarea id="b-notes" rows={3} value={form.notes} onChange={set("notes")} maxLength={2000} /></F>
             {date && time && (
               <p className="rounded-lg bg-secondary px-4 py-3 text-sm">
                 {format(date, "EEE, MMM d")} at <strong>{label12(time)}</strong>
@@ -183,7 +183,7 @@ function BookPage() {
   );
 }
 
-function F({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
+function F({ id, label, error, children }: { id: string; label: string; error?: string | undefined; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>

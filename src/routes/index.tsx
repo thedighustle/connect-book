@@ -74,18 +74,18 @@ function ContactPage() {
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-5" noValidate>
-              <Field id="name" label="Name" error={errors.name}>
+              <Field id="name" label="Name" error={errors["name"]}>
                 <Input id="name" value={form.name} onChange={set("name")} maxLength={100} />
               </Field>
               <div className="grid gap-5 sm:grid-cols-2">
-                <Field id="phone" label="Phone number" error={errors.phone}>
+                <Field id="phone" label="Phone number" error={errors["phone"]}>
                   <Input id="phone" type="tel" value={form.phone} onChange={set("phone")} maxLength={30} />
                 </Field>
-                <Field id="email" label="Email" error={errors.email}>
+                <Field id="email" label="Email" error={errors["email"]}>
                   <Input id="email" type="email" value={form.email} onChange={set("email")} maxLength={255} />
                 </Field>
               </div>
-              <Field id="message" label="Message" error={errors.message}>
+              <Field id="message" label="Message" error={errors["message"]}>
                 <Textarea id="message" rows={5} value={form.message} onChange={set("message")} maxLength={2000} />
               </Field>
               <Button type="submit" size="lg" className="w-full" disabled={sending}>
@@ -99,7 +99,7 @@ function ContactPage() {
   );
 }
 
-function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: React.ReactNode }) {
+function Field({ id, label, error, children }: { id: string; label: string; error?: string | undefined; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
