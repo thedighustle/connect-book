@@ -48,7 +48,7 @@ function ContactPage() {
     setSending(true);
     const { error } = await supabase.from("contact_submissions").insert(r.data);
     setSending(false);
-    if (error) return toast.error("Something went wrong. Please try again.");
+    if (error) { toast.error("Something went wrong. Please try again."); return; }
     setSent(true);
   }
 

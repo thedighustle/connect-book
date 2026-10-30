@@ -34,7 +34,7 @@ const schema = z.object({
 });
 
 function label12(t: string) {
-  const [h] = t.split(":").map(Number);
+  const h = Number(t.slice(0, 2));
   return `${h % 12 || 12}:00 ${h < 12 ? "AM" : "PM"}`;
 }
 
@@ -69,8 +69,8 @@ function BookPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!date) errs.date = "Please choose a date";
-    if (!time) errs.time = "Please choose a time";
+    if (!date) errs["date"] = "Please choose a date";
+    if (!time) errs["time"] = "Please choose a time";
     const r = schema.safeParse(form);
     if (!r.success) r.error.issues.forEach((i) => (errs[i.path[0] as string] = i.message));
     setErrors(errs);
