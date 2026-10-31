@@ -12,7 +12,15 @@ describe("Owner form delivery", () => {
     expect(fetchMock).toHaveBeenCalledWith("https://formsubmit.co/ajax/rikhi.ktik@gmail.com", {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ ...fields, _subject: "New Website Quote Request", _captcha: "false" }),
+      body: JSON.stringify({
+        "Full Name": "Test Client",
+        "Phone Number": "5551234567",
+        "Email Address": "client@example.com",
+        "Project Details": "Website quote",
+        _template: "table",
+        _subject: "New Lead Quote Request - Test Client",
+        _captcha: "false",
+      }),
     });
   });
 
