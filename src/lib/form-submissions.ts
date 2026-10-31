@@ -21,7 +21,14 @@ export async function postFormSubmission(fields: Record<string, string>) {
 }
 
 export function submitQuote(fields: ContactDetails & { message: string }) {
-  return postFormSubmission({ ...fields, _subject: "New Website Quote Request" });
+  return postFormSubmission({
+    "Full Name": fields.name,
+    "Phone Number": fields.phone,
+    "Email Address": fields.email,
+    "Project Details": fields.message,
+    _template: "table",
+    _subject: `New Lead Quote Request - ${fields.name}`,
+  });
 }
 
 export function bookingNotificationFields(
