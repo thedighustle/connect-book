@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { submitQuote } from "@/lib/form-submissions";
 import { SiteNav } from "@/components/SiteNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Contact Us" },
+      { title: "Quote Request | The Digital Hustle" },
       { name: "description", content: "Send us a message — we'll get back to you soon." },
-      { property: "og:title", content: "Contact Us" },
+      { property: "og:title", content: "Quote Request | The Digital Hustle" },
       { property: "og:description", content: "Send us a message — we'll get back to you soon." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ContactPage,
@@ -46,10 +48,14 @@ function ContactPage() {
     }
     setErrors({});
     setSending(true);
-    const { error } = await supabase.from("contact_submissions").insert(r.data);
-    setSending(false);
-    if (error) { toast.error("Something went wrong. Please try again."); return; }
-    setSent(true);
+    try {
+      await submitQuote(r.data);
+      setSent(true);
+    } catch {
+      toast.error("Your message could not be sent. Please try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (

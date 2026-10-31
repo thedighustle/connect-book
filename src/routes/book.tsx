@@ -11,14 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { bookingNotificationFields, postFormSubmission } from "@/lib/form-submissions";
 
 export const Route = createFileRoute("/book")({
   head: () => ({
     meta: [
-      { title: "Book an Appointment" },
+      { title: "Book an Appointment | The Digital Hustle" },
       { name: "description", content: "Pick a date and time that works for you." },
-      { property: "og:title", content: "Book an Appointment" },
+      { property: "og:title", content: "Book an Appointment | The Digital Hustle" },
       { property: "og:description", content: "Pick a date and time that works for you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: BookPage,
@@ -46,6 +49,24 @@ function BookPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState<{ date: Date; time: string } | null>(null);
+  const [pendingNotification, setPendingNotification] = useState<Record<string, string> | null>(null);
+
+  async function notifyOwner(fields: Record<string, string>) {
+    try {
+      await postFormSubmission(fields);
+      setPendingNotification(null);
+    } catch {
+      setPendingNotification(fields);
+      toast.warning("Your booking is saved, but the notification could not be sent.");
+    }
+  }
+
+  async function retryNotification() {
+    if (!pendingNotification) return;
+    setSending(true);
+    try { await notifyOwner(pendingNotification); }
+    finally { setSending(false); }
+  }
 
   const loadTaken = async (d: Date) => {
     const { data } = await supabase.rpc("get_booked_times", { _date: format(d, "yyyy-MM-dd") });
@@ -76,6 +97,7 @@ function BookPage() {
     setErrors(errs);
     if (Object.keys(errs).length || !r.success || !date || !time) return;
     setSending(true);
+    try {
     const { error } = await supabase.from("bookings").insert({
       name: r.data.name,
       phone: r.data.phone,
@@ -84,7 +106,6 @@ function BookPage() {
       booking_date: format(date, "yyyy-MM-dd"),
       booking_time: time,
     });
-    setSending(false);
     if (error) {
       if (error.code === "23505") {
         toast.error("That time was just taken — please pick another.");
@@ -94,6 +115,12 @@ function BookPage() {
       return;
     }
     setDone({ date, time });
+    await notifyOwner(bookingNotificationFields(r.data, format(date, "yyyy-MM-dd"), time, Intl.DateTimeFormat().resolvedOptions().timeZone));
+    } catch {
+      toast.error("Your booking could not be saved. Please try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   if (done) {
@@ -106,7 +133,15 @@ function BookPage() {
           <p className="mt-4 text-muted-foreground">
             {format(done.date, "EEEE, MMMM d, yyyy")} at {label12(done.time)}
           </p>
-          <Button className="mt-8" variant="outline" onClick={() => { setDone(null); setDate(undefined); setForm({ name: "", phone: "", email: "", notes: "" }); }}>
+          {pendingNotification && (
+            <div className="mt-6">
+              <p className="text-sm text-muted-foreground">Your booking is saved. The email notification is pending.</p>
+              <Button className="mt-3" variant="outline" disabled={sending} onClick={retryNotification}>
+                {sending ? "Sending…" : "Retry notification"}
+              </Button>
+            </div>
+          )}
+          <Button className="mt-8" variant="outline" disabled={sending || Boolean(pendingNotification)} onClick={() => { setDone(null); setDate(undefined); setForm({ name: "", phone: "", email: "", notes: "" }); }}>
             Book another
           </Button>
         </main>
