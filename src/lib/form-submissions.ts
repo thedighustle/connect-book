@@ -32,7 +32,7 @@ export function submitQuote(fields: ContactDetails & { message: string }) {
 }
 
 export function bookingNotificationFields(
-  details: ContactDetails & { notes: string },
+  details: ContactDetails & { notes: string; service: string },
   date: string,
   time: string,
   timeZone: string,
@@ -45,16 +45,20 @@ export function bookingNotificationFields(
     text: `The Digital Hustle — Booking with ${details.name}`,
     dates: `${start}/${end}`,
     ctz: timeZone,
-    details: `Client: ${details.name}\nPhone: ${details.phone}\nEmail: ${details.email}\nNotes: ${details.notes || "None"}`,
+    details: `Client: ${details.name}\nPhone: ${details.phone}\nEmail: ${details.email}\nService: ${details.service}\nNotes: ${details.notes || "None"}`,
     add: OWNER_EMAIL,
   });
   return {
-    ...details,
-    booking_date: date,
-    booking_time: time,
-    time_zone: timeZone,
-    primary_attendee: OWNER_EMAIL,
-    calendar_link: `https://calendar.google.com/calendar/render?${params}`,
-    _subject: "New Website Booking",
+    "Customer Name": details.name,
+    "Email Address": details.email,
+    "Phone Number": details.phone,
+    "Service Booked": details.service,
+    "Appointment Date": date,
+    "Appointment Time": time,
+    "Additional Notes": details.notes || "None",
+    "Add to Calendar": `https://calendar.google.com/calendar/render?${params}`,
+    _subject: `New Appointment Booking: ${details.service} - ${details.name}`,
+    _template: "table",
+    _replyto: details.email,
   };
 }

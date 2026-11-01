@@ -33,6 +33,7 @@ const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
   phone: z.string().trim().min(5, "Please enter a valid number").max(30).regex(/^[0-9+()\-\s.]+$/, "Please enter a valid number"),
   email: z.string().trim().email("Please enter a valid email").max(255),
+  service: z.string().trim().min(1, "Please enter the service you need").max(100),
   notes: z.string().trim().max(2000),
 });
 
@@ -45,7 +46,7 @@ function BookPage() {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>();
   const [taken, setTaken] = useState<string[]>([]);
-  const [form, setForm] = useState({ name: "", phone: "", email: "", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", service: "", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState<{ date: Date; time: string } | null>(null);
@@ -141,7 +142,7 @@ function BookPage() {
               </Button>
             </div>
           )}
-          <Button className="mt-8" variant="outline" disabled={sending || Boolean(pendingNotification)} onClick={() => { setDone(null); setDate(undefined); setForm({ name: "", phone: "", email: "", notes: "" }); }}>
+          <Button className="mt-8" variant="outline" disabled={sending || Boolean(pendingNotification)} onClick={() => { setDone(null); setDate(undefined); setForm({ name: "", phone: "", email: "", service: "", notes: "" }); }}>
             Book another
           </Button>
         </main>
@@ -202,6 +203,7 @@ function BookPage() {
             <F id="b-name" label="Name" error={errors["name"]}><Input id="b-name" value={form.name} onChange={set("name")} maxLength={100} /></F>
             <F id="b-phone" label="Phone number" error={errors["phone"]}><Input id="b-phone" type="tel" value={form.phone} onChange={set("phone")} maxLength={30} /></F>
             <F id="b-email" label="Email" error={errors["email"]}><Input id="b-email" type="email" value={form.email} onChange={set("email")} maxLength={255} /></F>
+            <F id="b-service" label="Service" error={errors["service"]}><Input id="b-service" placeholder="e.g. Website design" value={form.service} onChange={set("service")} maxLength={100} /></F>
             <F id="b-notes" label="Notes (optional)" error={errors["notes"]}><Textarea id="b-notes" rows={3} value={form.notes} onChange={set("notes")} maxLength={2000} /></F>
             {date && time && (
               <p className="rounded-lg bg-secondary px-4 py-3 text-sm">

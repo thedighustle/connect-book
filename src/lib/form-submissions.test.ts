@@ -24,11 +24,22 @@ describe("Owner form delivery", () => {
     });
   });
 
-  it("includes booking date, slot, all client details and the owner as calendar attendee", () => {
-    const details = { name: "Test Client", phone: "5551234567", email: "client@example.com", notes: "Discuss website" };
+  it("sends capitalized booking fields, table template, reply-to and a service-named subject", () => {
+    const details = { name: "Test Client", phone: "5551234567", email: "client@example.com", notes: "Discuss website", service: "Website Design" };
     const fields = bookingNotificationFields(details, "2026-11-02", "09:00", "America/Edmonton");
-    expect(fields).toMatchObject({ ...details, booking_date: "2026-11-02", booking_time: "09:00", primary_attendee: "rikhi.ktik@gmail.com" });
-    const link = new URL(fields.calendar_link);
+    expect(fields).toMatchObject({
+      "Customer Name": "Test Client",
+      "Email Address": "client@example.com",
+      "Phone Number": "5551234567",
+      "Service Booked": "Website Design",
+      "Appointment Date": "2026-11-02",
+      "Appointment Time": "09:00",
+      "Additional Notes": "Discuss website",
+      _subject: "New Appointment Booking: Website Design - Test Client",
+      _template: "table",
+      _replyto: "client@example.com",
+    });
+    const link = new URL(fields["Add to Calendar"]);
     expect(link.searchParams.get("add")).toBe("rikhi.ktik@gmail.com");
     expect(link.searchParams.get("dates")).toBe("20261102T090000/20261102T100000");
     expect(link.searchParams.get("ctz")).toBe("America/Edmonton");
